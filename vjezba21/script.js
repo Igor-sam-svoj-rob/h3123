@@ -14,4 +14,5 @@ console.log(document.body.innerHTML);
 console.log(document.body.innerText);
 
 // Ova priča nije samo read-only, mi možemo mijenjati stvari na ovaj način. Npr. izmjeniti sadržaj bodya...
-document.body.innerHTML = "<h1>Hello World</h1>";
+/* document.body.innerHTML = "<h1>Hello World</h1>";
+document.getElementById("header").innerHTML = "<h1>Hello World</h1>"; */
