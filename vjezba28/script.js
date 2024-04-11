@@ -19,17 +19,39 @@ const listaZadataka = document.getElementById("zadatak-list");
 const filter = document.getElementById("filter");
 const brisiSve = document.getElementById("clear");
 
+// Funkcija za povlačenje zadatka iz lokalnog spremišta
+
+const prikaziZadatkeLS = () => {
+  const zadaciSpremiste = dohvatiLocalStorage();
+  zadaciSpremiste.forEach((zadatak) => kreirajZadatak(zadatak));
+  provjeriListu();
+};
+
 // Funkcija za kreiranje novog zadatka
 const dodajZadatak = (e) => {
   e.preventDefault();
 
-  if (zadatakInput.value === "") {
+  const noviZadatak = zadatakInput.value.trim();
+
+  if (noviZadatak === "") {
     alert("Molimo vas unesite zadatak");
     return;
-  }
+  } else {
+    kreirajZadatak(noviZadatak);
 
+    provjeriListu();
+
+    // pozivanje funkcije za dodavanje novog zadatka u localStorage
+    dodajLocalStorage(noviZadatak);
+
+    zadatakInput.value = "";
+  }
+};
+
+// Funkcija za kreiranje zadatka
+const kreirajZadatak = (noviZadatak) => {
   const li = document.createElement("li");
-  li.appendChild(document.createTextNode(zadatakInput.value));
+  li.appendChild(document.createTextNode(noviZadatak));
 
   const delGumb = document.createElement("button");
   delGumb.className = "ukloni-zadatak btn-link";
@@ -40,10 +62,34 @@ const dodajZadatak = (e) => {
   delGumb.appendChild(ikona);
   li.appendChild(delGumb);
   listaZadataka.appendChild(li);
+};
 
-  provjeriListu();
+/* 
+Funkcija za dodavanje zadatak u localStorage. Prvo moramo provjeriti imamo li već zadatke u localStorageu. Ako nemamo (provjera sa if petljom)
+onda ćemo definirati našu varijablu kao praznu listu. S druge strane ako imamo nešto u spremištu, onda ćemo prvo spremiti ono što se nalazi
+unutra u našu varijablu. Ali s obzirom da u localStorageu imamo stringove(JSON format) moramo/možemo ih odmah parse metodom pretvoriti objekt.
+*/
 
-  zadatakInput.value = "";
+const dodajLocalStorage = (zadatakInput) => {
+  const zadaciSpremiste = dohvatiLocalStorage();
+  // push metodom ćemo spremiti novi zadatak u našu listu zadataka
+  zadaciSpremiste.push(zadatakInput);
+
+  // Kada dodamo novi zadatak, onda ga trebamo spremiti pomoću naše liste u localStorage kao string, stoga koristimo stringify metodu.
+  localStorage.setItem("kljuc", JSON.stringify(zadaciSpremiste));
+};
+
+// Funkcija za dohvaćanje podataka iz LocalStoragea
+const dohvatiLocalStorage = () => {
+  let zadaciSpremiste;
+
+  if (localStorage.getItem("kljuc") === null) {
+    zadaciSpremiste = [];
+  } else {
+    zadaciSpremiste = JSON.parse(localStorage.getItem("kljuc"));
+  }
+
+  return zadaciSpremiste;
 };
 
 // funkcija za brisanje pojedinačnog zadatka
@@ -92,4 +138,13 @@ forma.addEventListener("submit", dodajZadatak);
 listaZadataka.addEventListener("click", obrisiZadatak);
 brisiSve.addEventListener("click", obrisiZadatke);
 filter.addEventListener("input", filtrirajZadatke);
+/* 
+Napravit ćemo event listener koji će se okinuti u trenutku kada se dokument učitava i za event ćemo postaviti trenutak kad se učita DOM
+i definirat ćemo funkciju koja će ispisati podatke iz lokalnog spremišta. S obzirom da se to prvo u biti bude odradilo, tu funkciju ćemo
+postaviti kao prvu funkciju koja će se pojaviti u našoj skripti. Morat ćemo također prebaciti kreiranje samog elementa iz funkcije
+dodajZadatak u ovu novu funkciju kako bi spriječili duplo kreiranje zadatka na displayu, jer u biti sa ovom funkcijom dohvaćamo zadatke
+iz lokalnog spremišta i kreiramo ih sa podacima zapisanima u lokalnom spremištu.
+*/
+
+document.addEventListener("DOMContentLoaded", prikaziZadatkeLS);
 provjeriListu();
