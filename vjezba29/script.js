@@ -71,14 +71,28 @@ const dohvatiLocalStorage = () => {
 // funkcija za brisanje pojedinačnog zadatka
 const obrisiZadatak = (e) => {
   if (e.target.parentElement.classList.contains("ukloni-zadatak")) {
-    e.target.parentElement.parentElement.remove();
+    ukloniZadatak(e.target.parentElement.parentElement);
   }
+};
+
+// funkcija koja briše zadatak vizualno sa DOM-a i također prosljeđuje kao parametar podatak prema funkciji obrisiIzDOM-a zadatak koji brišemo.
+const ukloniZadatak = (zadatakIzDOM) => {
+  zadatakIzDOM.remove();
+  obrisiIzDOM(zadatakIzDOM.textContent);
   provjeriListu();
+};
+
+// Funkcija koja će dohvatiti zadatke iz LS-a i filter metodom obrisati kliknutog i nakon toga spremiti sve nazad u LS bez kliknutog zadatka.
+const obrisiIzDOM = (e) => {
+  let zadatakIzStoragea = dohvatiLocalStorage();
+  zadatakIzStoragea = zadatakIzStoragea.filter((zadatak) => zadatak !== e);
+  localStorage.setItem("kljuc", JSON.stringify(zadatakIzStoragea));
 };
 
 // funkcija za brisanje svih zadataka
 const obrisiZadatke = () => {
   listaZadataka.innerHTML = "";
+  localStorage.removeItem("kljuc");
   provjeriListu();
 };
 
