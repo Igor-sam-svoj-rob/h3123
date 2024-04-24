@@ -28,8 +28,18 @@ const noviTodo = (todo) => {
   document.getElementById("todo-list").appendChild(div);
 };
 
-const deleteTodo = () => {
-  console.log("bok");
+const deleteTodo = (e) => {
+  if (e.target.classList.contains("fa-trash")) {
+    const id = e.target.dataset.id;
+    fetch(`${apiUrl}/${id}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then(() => {
+        const todoDiv = e.target.closest(".todo");
+        todoDiv.remove();
+      });
+  }
 };
 
 const createTodo = (e) => {
